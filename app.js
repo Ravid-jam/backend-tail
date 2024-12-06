@@ -7,38 +7,37 @@ const authRoutes = require("./routes/auth");
 const merchant = require("./routes/merchant");
 const employee = require("./routes/employee");
 const employeeWork = require("./routes/employeeWork");
-const authenticateToken = require("./middleware/auth");
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
 
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1); // Exit the process if MongoDB connection fails
+  });
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URL);
-    console.log("MongoDB connected");
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
-  }
-};
-// Connect to MongoDB
-connectDB();
 
 app.use("/auth", authRoutes);
 app.use("/merchants", merchant);
 app.use("/employee", employee);
 app.use("/employeeWork", employeeWork);
 
-app.get("/protected", authenticateToken, (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
+app.use(function (req, res, next) {
+  res.json({
+    message: "Hello , welcome to backend",
+    status: 200,
+  });
 });
+app.use(function (err, req, res, next) {
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
 
-const port = 5000;
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  res.status(err.status || 500);
+  res.render("error");
 });
