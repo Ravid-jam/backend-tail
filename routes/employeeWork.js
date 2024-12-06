@@ -56,6 +56,39 @@ router.get("/view-work/:employeeId/:date", async (req, res) => {
   }
 });
 
+router.put("/update/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { itemName, itemPrice, quantity } = req.body;
+
+    if (!itemName || !itemPrice || !quantity) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const totalPrice = itemPrice * quantity;
+
+    const updatedWorkHistory = await WorkHistory.findByIdAndUpdate(
+      id,
+      { itemName, itemPrice, quantity, totalPrice },
+      { new: true }
+    );
+
+    if (!updatedWorkHistory) {
+      return res.status(404).json({ message: "Work history not found" });
+    }
+
+    res.status(200).json({
+      message: "Work history updated successfully",
+      workHistory: updatedWorkHistory,
+    });
+  } catch (err) {
+    console.error("Error updating work history:", err);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
+  }
+});
+
 router.get("/view-monthly/:employeeId/:month", async (req, res) => {
   try {
     const { employeeId, month } = req.params;
