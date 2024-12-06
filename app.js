@@ -7,11 +7,10 @@ const authRoutes = require("./routes/auth");
 const merchant = require("./routes/merchant");
 const employee = require("./routes/employee");
 const employeeWork = require("./routes/employeeWork");
-require("dotenv").config();
 
 const app = express();
 app.use(cors());
-
+require("dotenv").config();
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
