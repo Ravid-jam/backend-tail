@@ -24,37 +24,6 @@ router.post("/create", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-router.get("/view-work/:employeeId/:date", async (req, res) => {
-  try {
-    const { employeeId, date } = req.params;
-
-    const workHistory = await WorkHistory.find({
-      employeeId,
-      date: {
-        $gte: new Date(date),
-        $lt: new Date(new Date(date).setDate(new Date(date).getDate() + 1)),
-      },
-    }).populate({
-      path: "employeeId",
-      select: "name mobile address",
-    });
-
-    if (workHistory.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No work history found for this date" });
-    }
-
-    const dailyTotal = workHistory.reduce(
-      (total, entry) => total + entry.totalPrice,
-      0
-    );
-
-    res.status(200).json({ workHistory, dailyTotal });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 router.put("/update/:id", async (req, res) => {
   try {
@@ -86,6 +55,59 @@ router.put("/update/:id", async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal server error", error: err.message });
+  }
+});
+
+router.get("/view-single/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const workHistory = await WorkHistory.findById(id).populate({
+      path: "employeeId",
+      select: "name mobile address",
+    });
+
+    if (!workHistory) {
+      return res.status(404).json({ message: "Work history not found" });
+    }
+
+    res.status(200).json(workHistory);
+  } catch (err) {
+    console.error("Error fetching work history:", err);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
+  }
+});
+router.get("/view-work/:employeeId/:date", async (req, res) => {
+  try {
+    const { employeeId, date } = req.params;
+
+    const workHistory = await WorkHistory.find({
+      employeeId,
+      date: {
+        $gte: new Date(date),
+        $lt: new Date(new Date(date).setDate(new Date(date).getDate() + 1)),
+      },
+    }).populate({
+      path: "employeeId",
+      select: "name mobile address",
+    });
+
+    if (workHistory.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No work history found for this date" });
+    }
+
+    const dailyTotal = workHistory.reduce(
+      (total, entry) => total + entry.totalPrice,
+      0
+    );
+
+    res.status(200).json({ workHistory, dailyTotal });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
