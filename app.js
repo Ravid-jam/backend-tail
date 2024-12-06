@@ -3,16 +3,16 @@ var cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 // const connectDB = require("./database/db");
-const app = express();
-app.use(cors());
-require("dotenv").config();
 const authRoutes = require("./routes/auth");
 const merchant = require("./routes/merchant");
 const employee = require("./routes/employee");
 const employeeWork = require("./routes/employeeWork");
 
+const app = express();
+require("dotenv").config();
+app.use(cors());
 mongoose
-  .connect("mongodb+srv://dhanani:dhanani@cluster0.hhz4d.mongodb.net/")
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
