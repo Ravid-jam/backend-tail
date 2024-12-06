@@ -12,10 +12,7 @@ const app = express();
 app.use(cors());
 require("dotenv").config();
 mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect("mongodb+srv://dhanani:dhanani@cluster0.hhz4d.mongodb.net/")
   .then(() => console.log("MongoDB connected"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
