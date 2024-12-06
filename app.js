@@ -13,7 +13,10 @@ const app = express();
 app.use(cors());
 
 mongoose
-  .connect(process.env.MONGO_URL)
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
@@ -27,10 +30,9 @@ app.use("/auth", authRoutes);
 app.use("/merchants", merchant);
 app.use("/employee", employee);
 app.use("/employeeWork", employeeWork);
-
-app.use(function (req, res, next) {
+app.get("/", (req, res) => {
   res.json({
-    message: "Hello , welcome to backend",
+    message: "Hello, welcome to the backend",
     status: 200,
   });
 });
