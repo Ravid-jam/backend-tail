@@ -1,10 +1,8 @@
 const express = require("express");
 var cors = require("cors");
 const bodyParser = require("body-parser");
-// const connectDB = require("./database/db");
 const authRoutes = require("./routes/auth");
 const merchant = require("./routes/merchant");
-const mongoose = require("mongoose");
 const employee = require("./routes/employee");
 const employeeWork = require("./routes/employeeWork");
 const authenticateToken = require("./middleware/auth");
@@ -15,7 +13,6 @@ app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// connectDB();
 
 require("./database/db");
 app.use("/auth", authRoutes);
