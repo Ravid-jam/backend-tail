@@ -4,8 +4,7 @@
   "description": "Example of JWT authentication using Express and Mongoose",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "node app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
