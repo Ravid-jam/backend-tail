@@ -79,6 +79,25 @@ router.put("/update/:id", async (req, res) => {
   }
 });
 
+router.get("/get-employee/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const employee = await Employee.findById(id);
+
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Employee get successfully", employee: employee });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
 router.delete("/delete-employee/:id", async (req, res) => {
   try {
     await Employee.findByIdAndDelete(req.params.id);
