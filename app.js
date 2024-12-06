@@ -15,14 +15,9 @@ app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("connected"));
 // connectDB();
-app.use(function (req, res, next) {
-  res.json({
-    message: "Hello , welcome to backend",
-    status: 200,
-  });
-});
+
+require("./database/db");
 app.use("/auth", authRoutes);
 app.use("/merchants", merchant);
 app.use("/employee", employee);
