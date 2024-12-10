@@ -5,6 +5,7 @@ const authRoutes = require("./routes/auth");
 const merchant = require("./routes/merchant");
 const employee = require("./routes/employee");
 const employeeWork = require("./routes/employeeWork");
+const stocks = require("./routes/stocks");
 const authenticateToken = require("./middleware/auth");
 require("dotenv").config();
 
@@ -19,6 +20,7 @@ app.use("/auth", authRoutes);
 app.use("/merchants", merchant);
 app.use("/employee", employee);
 app.use("/employeeWork", employeeWork);
+app.use("/stocks", stocks);
 
 app.get("/protected", authenticateToken, (req, res) => {
   res.json({ message: "This is a protected route", user: req.user });

@@ -1,8 +1,9 @@
 const express = require("express");
+const authenticateToken = require("../middleware/auth");
 const WorkHistory = require("../models/EmployeeWork");
 const router = express.Router();
 
-router.post("/create", async (req, res) => {
+router.post("/create", authenticateToken, async (req, res) => {
   try {
     const { employeeId, itemName, itemPrice, quantity } = req.body;
 
@@ -52,6 +53,28 @@ router.put("/update/:id", async (req, res) => {
     });
   } catch (err) {
     console.error("Error updating work history:", err);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
+  }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedWorkHistory = await WorkHistory.findByIdAndDelete(id);
+
+    if (!deletedWorkHistory) {
+      return res.status(404).json({ message: "Work history not found" });
+    }
+
+    res.status(200).json({
+      message: "Work history deleted successfully",
+      deletedWorkHistory,
+    });
+  } catch (err) {
+    console.error("Error deleting work history:", err);
     res
       .status(500)
       .json({ message: "Internal server error", error: err.message });

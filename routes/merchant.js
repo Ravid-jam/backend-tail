@@ -2,7 +2,7 @@ const express = require("express");
 const Merchant = require("../models/Merchant");
 const authenticateToken = require("../middleware/auth");
 const router = express.Router();
-
+const mongoose = require("mongoose");
 router.post("/create", authenticateToken, async (req, res) => {
   const { name, mobile, address, user } = req.body;
 
@@ -21,10 +21,42 @@ router.post("/create", authenticateToken, async (req, res) => {
     .json({ message: "Merchant created successfully", merchant: newMerchant });
 });
 
-router.post("/get", authenticateToken, async (req, res) => {
-  const { id } = req.body;
+router.get("/get/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
   try {
-    const merchants = await Merchant.find({ user: id });
+    const merchants = await Merchant.aggregate([
+      { $match: { user: new mongoose.Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: "stocks",
+          localField: "_id",
+          foreignField: "merchantId",
+          as: "stocks",
+        },
+      },
+      {
+        $addFields: {
+          totalStockPrice: {
+            $sum: {
+              $map: {
+                input: "$stocks",
+                as: "stock",
+                in: { $multiply: ["$$stock.quantity", "$$stock.price"] },
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          mobile: 1,
+          address: 1,
+          totalStockPrice: 1,
+          stocks: 1,
+        },
+      },
+    ]);
 
     if (merchants.length === 0) {
       return res
@@ -35,7 +67,7 @@ router.post("/get", authenticateToken, async (req, res) => {
     res.status(200).json(merchants);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: err });
   }
 });
 
